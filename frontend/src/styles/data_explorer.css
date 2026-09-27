@@ -1,0 +1,43 @@
+.data-explorer-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.data-export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.btn-export:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+.json-preview-card {
+  max-height: 120px;
+  overflow-y: auto;
+  background: #020617;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #38bdf8;
+  border: 1px solid var(--border-subtle);
+}

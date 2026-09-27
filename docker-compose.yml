@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: crawlix_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: crawlix_user
+      POSTGRES_PASSWORD: crawlix_password
+      POSTGRES_DB: crawlix_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Redis Broker & Cache
+  redis:
+    image: redis:7-alpine
+    container_name: crawlix_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  # FastAPI API Gateway
+  api:
+    build: ./backend
+    container_name: crawlix_api
+    restart: always
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - DATABASE_URL_SYNC=postgresql://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+
+  # Celery Worker Node 1 (High Priority & Scraping Pool)
+  worker_1:
+    build: ./backend
+    container_name: crawlix_worker_1
+    restart: always
+    command: celery -A app.workers.celery_app worker -Q high_priority,scraping_pool -l INFO --concurrency=4 -n worker1@%h
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - DATABASE_URL_SYNC=postgresql://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./backend:/app
+
+  # Celery Worker Node 2 (AI Intelligence & Scraping Pool)
+  worker_2:
+    build: ./backend
+    container_name: crawlix_worker_2
+    restart: always
+    command: celery -A app.workers.celery_app worker -Q ai_analysis,scraping_pool -l INFO --concurrency=4 -n worker2@%h
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - DATABASE_URL_SYNC=postgresql://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./backend:/app
+
+  # Celery Beat (Scheduler for node heartbeats and recurring jobs)
+  celery_beat:
+    build: ./backend
+    container_name: crawlix_beat
+    restart: always
+    command: celery -A app.workers.celery_app beat -l INFO
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - DATABASE_URL_SYNC=postgresql://crawlix_user:crawlix_password@postgres:5432/crawlix_db
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./backend:/app
+
+  # Frontend (Vite / React)
+  frontend:
+    build: ./frontend
+    container_name: crawlix_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
