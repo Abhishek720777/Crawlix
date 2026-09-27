@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, model_validator
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
@@ -9,11 +9,11 @@ class UserRegister(BaseModel):
     password: str = Field(..., min_length=6)
     confirm_password: str = Field(..., min_length=6)
 
-    @field_validator("confirm_password")
-    def passwords_match(cls, v, values):
-        if "password" in values.data and v != values.data["password"]:
+    @model_validator(mode="after")
+    def check_passwords_match(self) -> "UserRegister":
+        if self.password != self.confirm_password:
             raise ValueError("Passwords do not match")
-        return v
+        return self
 
 class UserLogin(BaseModel):
     username_or_email: str

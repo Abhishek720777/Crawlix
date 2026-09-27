@@ -4,6 +4,11 @@
 .env.*.local
 *.env
 
+# Celery
+celerybeat-schedule
+celerybeat.pid
+*.dump
+
 # Python artifacts
 __pycache__/
 *.py[cod]
