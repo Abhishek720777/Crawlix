@@ -22,9 +22,15 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       return { success: true };
     } catch (error) {
+      let msg = 'Login failed. Please check credentials.';
+      if (error.response?.data?.detail) {
+        msg = typeof error.response.data.detail === 'string' 
+          ? error.response.data.detail 
+          : JSON.stringify(error.response.data.detail);
+      }
       return {
         success: false,
-        error: error.response?.data?.detail || 'Login failed. Please check credentials.'
+        error: msg
       };
     } finally {
       setLoading(false);
@@ -47,9 +53,17 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       return { success: true };
     } catch (error) {
+      let msg = 'Registration failed. Please try again.';
+      if (error.response?.data?.detail) {
+        msg = typeof error.response.data.detail === 'string' 
+          ? error.response.data.detail 
+          : JSON.stringify(error.response.data.detail);
+      } else if (error.message) {
+        msg = error.message;
+      }
       return {
         success: false,
-        error: error.response?.data?.detail || 'Registration failed. Please try again.'
+        error: msg
       };
     } finally {
       setLoading(false);

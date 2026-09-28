@@ -1,19 +1,31 @@
 from contextlib import asynccontextmanager
+import asyncio
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import async_engine, Base
+import app.models.models  # Crucial: Import models so SQLAlchemy Base knows about table definitions
 from app.api.v1.auth import router as auth_router
 from app.api.v1.jobs import router as jobs_router
 from app.api.v1.data import router as data_router
 from app.api.v1.nodes import router as nodes_router
 from app.api.v1.websockets import router as ws_router
 
+logger = logging.getLogger("uvicorn")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize DB tables on startup
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    # Retry connecting to PostgreSQL on startup until ready
+    for attempt in range(10):
+        try:
+            async with async_engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("Successfully connected to PostgreSQL and created database tables.")
+            break
+        except Exception as e:
+            logger.warning(f"Waiting for database connection... (Attempt {attempt+1}/10): {e}")
+            await asyncio.sleep(2)
     yield
 
 app = FastAPI(
