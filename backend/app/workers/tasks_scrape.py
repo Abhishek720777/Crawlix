@@ -94,9 +94,12 @@ def execute_crawl_page(self, job_id: str, url: str, crawler_type: str, custom_se
         job.pages_crawled += 1
         job.records_extracted += 1
         
+        has_spawned_subtasks = False
         # Follow links if depth allows and limit not reached
         if depth < max_depth and job.pages_crawled < job.max_pages:
-            for next_link in parsed.get("discovered_links", [])[:3]:
+            discovered = parsed.get("discovered_links", [])[:3]
+            for next_link in discovered:
+                has_spawned_subtasks = True
                 execute_crawl_page.delay(
                     job_id=job_id,
                     url=next_link,
@@ -106,11 +109,10 @@ def execute_crawl_page(self, job_id: str, url: str, crawler_type: str, custom_se
                     max_depth=max_depth
                 )
 
-        # Check if job reached target limit or completion
-        if job.pages_crawled >= job.max_pages:
+        # Trigger completion when max_pages reached OR no more links to crawl at max depth
+        if job.pages_crawled >= job.max_pages or (depth >= max_depth and not has_spawned_subtasks):
             job.status = "completed"
             job.completed_at = datetime.datetime.now(datetime.timezone.utc)
-            # Trigger intelligence post-processor
             generate_job_intelligence.delay(job_id=job.id)
 
         session.commit()
