@@ -41,6 +41,7 @@ class CrawlJob(Base):
     pages_crawled = Column(Integer, default=0)
     records_extracted = Column(Integer, default=0)
     errors_count = Column(Integer, default=0)
+    pending_tasks = Column(Integer, default=0)  # Tracks live Celery subtasks; 0 = all done
     
     owner_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     owner = relationship("User", back_populates="jobs")

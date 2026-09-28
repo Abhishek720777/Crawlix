@@ -3,6 +3,7 @@ import asyncio
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from app.core.config import settings
 from app.core.database import async_engine, Base
 import app.models.models  # Crucial: Import models so SQLAlchemy Base knows about table definitions
@@ -21,7 +22,11 @@ async def lifespan(app: FastAPI):
         try:
             async with async_engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
-            logger.info("Successfully connected to PostgreSQL and created database tables.")
+                # Idempotent migration: add pending_tasks if not already present
+                await conn.execute(text(
+                    "ALTER TABLE crawl_jobs ADD COLUMN IF NOT EXISTS pending_tasks INTEGER DEFAULT 0"
+                ))
+            logger.info("Successfully connected to PostgreSQL and applied schema migrations.")
             break
         except Exception as e:
             logger.warning(f"Waiting for database connection... (Attempt {attempt+1}/10): {e}")
