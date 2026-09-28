@@ -51,7 +51,7 @@ def orchestrate_job(self, job_id: str):
                 url=url,
                 crawler_type=job.crawler_type,
                 custom_selectors=job.css_selectors,
-                depth=1,
+                depth=0,        # Seeds start at 0; max_depth=1 means follow 1 level of links
                 max_depth=job.max_depth,
                 max_pages=job.max_pages,
             )
@@ -71,7 +71,7 @@ def orchestrate_job(self, job_id: str):
 
 @celery_app.task(name="app.workers.tasks_scrape.execute_crawl_page", bind=True, max_retries=2, default_retry_delay=5)
 def execute_crawl_page(self, job_id: str, url: str, crawler_type: str,
-                        custom_selectors: dict = None, depth: int = 1,
+                        custom_selectors: dict = None, depth: int = 0,
                         max_depth: int = 1, max_pages: int = 50):
     """Scrapes a single URL, saves a record, spawns child tasks if depth allows."""
     worker_hostname = socket.gethostname()
@@ -147,11 +147,13 @@ def execute_crawl_page(self, job_id: str, url: str, crawler_type: str,
         session.refresh(job)
         logger.info(f"[{worker_hostname}] Saved record for {url} | job pages: {job.pages_crawled}/{max_pages}")
 
-        # -- 6. Spawn child tasks if we haven't hit max_pages and depth allows --
+        # -- 6. Spawn child tasks if depth allows and we haven't hit max_pages --
         if depth < max_depth and job.pages_crawled < max_pages:
-            discovered = parsed.get("discovered_links", [])[:5]  # up to 5 child links
+            # Take up to 5 links but don't exceed remaining page budget
+            remaining = max_pages - job.pages_crawled
+            discovered = parsed.get("discovered_links", [])[:min(5, remaining)]
             if discovered:
-                # Atomically reserve capacity in pending_tasks for child tasks
+                # Atomically reserve pending_tasks slots for children BEFORE dispatching
                 session.execute(
                     update(CrawlJob).where(CrawlJob.id == job_id).values(
                         pending_tasks=CrawlJob.pending_tasks + len(discovered)
@@ -169,7 +171,7 @@ def execute_crawl_page(self, job_id: str, url: str, crawler_type: str,
                         max_depth=max_depth,
                         max_pages=max_pages,
                     )
-                logger.info(f"[{worker_hostname}] Spawned {children_spawned} children at depth {depth+1}")
+                logger.info(f"[{worker_hostname}] Spawned {children_spawned} children at depth {depth+1} | budget left: {remaining}")
 
     except Exception as e:
         try:

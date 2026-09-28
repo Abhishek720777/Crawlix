@@ -42,7 +42,7 @@ class CrawlJobCreate(BaseModel):
     target_urls: List[str] = Field(..., min_items=1)
     crawler_type: str = Field(default="generic", description="generic | ecommerce | news | schema")
     priority: str = Field(default="normal", description="low | normal | high")
-    max_depth: int = Field(default=1, ge=1, le=5)
+    max_depth: int = Field(default=2, ge=1, le=5)
     max_pages: int = Field(default=50, ge=1, le=1000)
     rate_limit_rps: float = Field(default=2.0, ge=0.1, le=20.0)
     css_selectors: Optional[Dict[str, str]] = None
@@ -65,6 +65,7 @@ class CrawlJobResponse(BaseModel):
     pages_crawled: int
     records_extracted: int
     errors_count: int
+    pending_tasks: int
     owner_id: str
     created_at: datetime
     started_at: Optional[datetime]
