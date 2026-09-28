@@ -91,6 +91,7 @@ async def control_job(
         job.pages_crawled = 0
         job.records_extracted = 0
         job.errors_count = 0
+        job.pending_tasks = 0
         job.started_at = None
         job.completed_at = None
         try:
