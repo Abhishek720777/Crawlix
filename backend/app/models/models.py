@@ -7,6 +7,9 @@ from app.core.database import Base
 def generate_uuid():
     return str(uuid.uuid4())
 
+def utc_now():
+    return datetime.now(timezone.utc)
+
 class User(Base):
     __tablename__ = "users"
 
@@ -16,7 +19,7 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     jobs = relationship("CrawlJob", back_populates="owner", cascade="all, delete-orphan")
 
@@ -42,9 +45,9 @@ class CrawlJob(Base):
     owner_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     owner = relationship("User", back_populates="jobs")
     
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
-    started_at = Column(DateTime, nullable=True)
-    completed_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    started_at = Column(DateTime(timezone=True), nullable=True)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
 
     records = relationship("ScrapedRecord", back_populates="job", cascade="all, delete-orphan")
     intelligence_reports = relationship("IntelligenceReport", back_populates="job", cascade="all, delete-orphan")
@@ -65,7 +68,7 @@ class ScrapedRecord(Base):
     raw_html_snippet = Column(Text, nullable=True)
     worker_node = Column(String(100), default="worker-1")
     
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     job = relationship("CrawlJob", back_populates="records")
 
@@ -79,7 +82,7 @@ class IntelligenceReport(Base):
     metrics = Column(JSON, nullable=False)  # Aggregated insights
     summary_text = Column(Text, nullable=True)
     
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     job = relationship("CrawlJob", back_populates="intelligence_reports")
 
@@ -97,4 +100,4 @@ class WorkerNode(Base):
     failed_tasks = Column(Integer, default=0)
     cpu_usage = Column(Float, default=0.0)
     memory_usage = Column(Float, default=0.0)
-    last_heartbeat = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    last_heartbeat = Column(DateTime(timezone=True), default=utc_now)
