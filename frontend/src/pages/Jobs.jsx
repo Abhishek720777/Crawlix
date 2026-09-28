@@ -34,6 +34,9 @@ const Jobs = () => {
     if (searchParams.get('action') === 'new') {
       setShowModal(true);
     }
+    // Auto-refresh to show live job progress
+    const interval = setInterval(fetchJobs, 5000);
+    return () => clearInterval(interval);
   }, [searchParams]);
 
   const handleCreateJob = async (e) => {

@@ -56,7 +56,10 @@ class CrawlerEngine:
         if not html:
             return {"title": "No HTML Content", "data": {}, "discovered_links": []}
 
-        soup = BeautifulSoup(html, "lxml" if "lxml" in BeautifulSoup.NO_PARSERS else "html.parser")
+        try:
+            soup = BeautifulSoup(html, "lxml")
+        except Exception:
+            soup = BeautifulSoup(html, "html.parser")
         
         # 1. Base Meta Extraction
         title = soup.title.string.strip() if soup.title and soup.title.string else url

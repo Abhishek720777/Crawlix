@@ -16,8 +16,15 @@ def generate_job_intelligence(job_id: str):
         if not job:
             return
 
+        # Skip if a report already exists to prevent duplicates
+        existing_report = session.query(IntelligenceReport).filter(IntelligenceReport.job_id == job_id).first()
+        if existing_report:
+            logger.info(f"[Intelligence Engine] Report already exists for job {job_id}, skipping.")
+            return
+
         records = session.query(ScrapedRecord).filter(ScrapedRecord.job_id == job_id).all()
         if not records:
+            logger.warning(f"[Intelligence Engine] No records found for job {job_id}, skipping intelligence generation.")
             return
 
         avg_latency = round(sum(r.response_time_ms for r in records) / len(records), 2)
