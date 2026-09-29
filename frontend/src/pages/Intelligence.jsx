@@ -92,12 +92,14 @@ const Intelligence = () => {
               </div>
 
               <div style={{ 
-                background: 'rgba(99, 102, 241, 0.08)', 
-                border: '1px solid rgba(99, 102, 241, 0.2)',
+                background: 'var(--paper, #eef1ec)', 
+                border: '1.5px solid var(--ink, #101214)',
                 padding: '1.25rem',
-                borderRadius: 'var(--radius-sm)',
+                borderRadius: '8px',
                 lineHeight: 1.6,
-                color: '#e0e7ff'
+                color: 'var(--ink, #101214)',
+                fontWeight: 500,
+                boxShadow: '2px 2px 0 var(--ink, #101214)'
               }}>
                 {activeReport.summary_text}
               </div>
