@@ -10,10 +10,6 @@ const Navbar = ({ title = "Dashboard" }) => {
     <header className="navbar">
       <div className="navbar-title-container">
         <h1 className="navbar-page-title">{title}</h1>
-        <div className="system-status-pill">
-          <span className="status-dot"></span>
-          <span>MESH READY</span>
-        </div>
       </div>
 
       <div className="navbar-actions">

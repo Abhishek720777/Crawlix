@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import "../styles/Home.css";
 
 const MODES = [
@@ -38,13 +40,13 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 export default function Home() {
   const nav = useNavigate();
+  const { isAuthenticated } = useAuth();
   const root = useRef(null);
   const pin = useRef(null);
   const [stage, setStage] = useState(0);
   const [mode, setMode] = useState(0);
   const [filter, setFilter] = useState("all");
   const [nodes, setNodes] = useState(seed);
-  const [pages, setPages] = useState(128440);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -95,13 +97,18 @@ export default function Home() {
           done: n.done + Math.floor(Math.random() * 6),
         }))
       );
-      setPages((p) => p + Math.floor(Math.random() * 40 + 10));
     }, 1300);
     return () => clearInterval(t);
   }, []);
 
   const rows = ROWS.filter((r) => filter === "all" || r[4] === filter);
-  const go = (p) => () => nav(p);
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      nav('/dashboard');
+    } else {
+      nav('/register');
+    }
+  };
 
   return (
     <div
@@ -128,8 +135,18 @@ export default function Home() {
           <a href="#modes">Modes</a>
         </nav>
         <div className="cx-navbtn">
-          <button className="btn ghost" onClick={go("/login")}>Log in</button>
-          <button className="btn solid" onClick={go("/register")}>Start crawling</button>
+          {isAuthenticated ? (
+            <button className="btn solid" onClick={() => nav('/dashboard')}>
+              Dashboard <ArrowRight size={15} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+            </button>
+          ) : (
+            <>
+              <button className="btn ghost" onClick={() => nav('/login')}>Log in</button>
+              <button className="btn solid" onClick={handleGetStarted}>
+                Get Started <ArrowRight size={15} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 4 }} />
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -149,7 +166,6 @@ export default function Home() {
         </div>
 
         <div className="hero-copy">
-          <p className="pill"><i /> {pages.toLocaleString()} pages crawled while you read this</p>
           <h1>
             <span className="ln"><b>Crawl the</b></span>
             <span className="ln"><b>whole web,</b></span>
@@ -161,8 +177,9 @@ export default function Home() {
             and writes the intelligence report when the crawl is done.
           </p>
           <div className="cta-row">
-            <button className="btn solid big" onClick={go("/register")}>Create free account</button>
-            <button className="btn ghost big" onClick={go("/login")}>I already have one</button>
+            <button className="btn solid big" onClick={handleGetStarted}>
+              Get Started <ArrowRight size={18} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 6 }} />
+            </button>
           </div>
         </div>
 
@@ -308,8 +325,9 @@ export default function Home() {
         <div className="fweb" data-speed="0.12" aria-hidden="true" />
         <h2 className="rv">Your first crawl is one form away.</h2>
         <div className="cta-row rv">
-          <button className="btn solid big" onClick={go("/register")}>Create free account</button>
-          <button className="btn ghost big" onClick={go("/login")}>Log in</button>
+          <button className="btn solid big" onClick={handleGetStarted}>
+            Get Started <ArrowRight size={18} style={{ display: 'inline', verticalAlign: 'middle', marginLeft: 6 }} />
+          </button>
         </div>
       </section>
 

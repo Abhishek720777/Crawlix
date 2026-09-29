@@ -238,6 +238,11 @@ input:focus, select:focus, textarea:focus {
   width: min(580px, 95vw);
   max-height: 90vh;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.modal-card::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .modal-title  { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; color: var(--ink); letter-spacing: -0.03em; }

@@ -20,10 +20,12 @@ const Sidebar = () => {
     <aside className="sidebar">
       <div className="sidebar-logo">
         <div className="logo-icon">
-          <Terminal size={22} />
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" fill="currentColor" />
+            <path d="M12 9V3M12 15v6M9 12H3M15 12h6M9.9 9.9 5.6 5.6M14.1 14.1l4.3 4.3M14.1 9.9l4.3-4.3M9.9 14.1l-4.3 4.3" />
+          </svg>
         </div>
         <span className="logo-text">Crawlix</span>
-        <span className="sidebar-badge">v1.0</span>
       </div>
 
       <nav className="sidebar-nav">
@@ -66,7 +68,7 @@ const Sidebar = () => {
 
         <button className="btn-logout" onClick={logout}>
           <LogOut size={16} />
-          <span>Disconnect</span>
+          <span>Logout</span>
         </button>
       </div>
     </aside>

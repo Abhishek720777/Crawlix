@@ -142,19 +142,26 @@
   cursor: not-allowed;
 }
 
-.auth-footer-links {
+.auth-footer-links,
+.auth-footer-prompt {
   text-align: center;
   margin-top: 1.5rem;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--muted, #69707d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.auth-footer-links a {
-  color: var(--cobalt, #2a3cff);
+.auth-footer-links a,
+.auth-footer-prompt a {
+  color: var(--cobalt, #2a3cff) !important;
   font-weight: 700;
   text-decoration: none;
 }
 
-.auth-footer-links a:hover {
+.auth-footer-links a:hover,
+.auth-footer-prompt a:hover {
   text-decoration: underline;
 }
