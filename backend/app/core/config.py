@@ -1,4 +1,5 @@
 import os
+from typing import List
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -23,6 +24,15 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
+
+    # CORS
+    ALLOWED_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000"
+    ]
 
     class Config:
         env_file = ".env"

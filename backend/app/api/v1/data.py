@@ -82,19 +82,25 @@ async def export_data(
         )
 
     elif format == "csv":
+        def sanitize_csv_cell(val: Any) -> str:
+            s = str(val) if val is not None else ""
+            if s and s[0] in ('=', '+', '-', '@', '\t', '\r'):
+                return f"'{s}"
+            return s
+
         output = io.StringIO()
         writer = csv.writer(output)
         writer.writerow(["ID", "URL", "HTTP_Status", "Response_Time_MS", "Page_Title", "Structured_Data_JSON", "Worker_Node", "Created_At"])
         for r in records:
             writer.writerow([
-                r.id,
-                r.url,
-                r.http_status,
-                r.response_time_ms,
-                r.page_title or "",
-                json.dumps(r.structured_data or {}),
-                r.worker_node,
-                r.created_at.isoformat() if r.created_at else ""
+                sanitize_csv_cell(r.id),
+                sanitize_csv_cell(r.url),
+                sanitize_csv_cell(r.http_status),
+                sanitize_csv_cell(r.response_time_ms),
+                sanitize_csv_cell(r.page_title or ""),
+                sanitize_csv_cell(json.dumps(r.structured_data or {})),
+                sanitize_csv_cell(r.worker_node),
+                sanitize_csv_cell(r.created_at.isoformat() if r.created_at else "")
             ])
         output.seek(0)
         return StreamingResponse(
