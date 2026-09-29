@@ -16,28 +16,32 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
+  background: var(--panel, #ffffff);
+  border: 1.5px solid var(--ink, #101214);
+  color: var(--ink, #101214);
   padding: 8px 14px;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 2px 2px 0 var(--ink, #101214);
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
 .btn-export:hover {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
+  background: var(--lime, #c6f24e);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--ink, #101214);
 }
 
 .json-preview-card {
-  max-height: 120px;
+  max-height: 140px;
   overflow-y: auto;
-  background: #020617;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: #38bdf8;
-  border: 1px solid var(--border-subtle);
+  background: var(--ink, #101214);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--lime, #c6f24e);
+  border: 1.5px solid var(--ink, #101214);
 }

@@ -12,32 +12,33 @@
 }
 
 .intel-card {
-  background: var(--bg-card);
-  backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  background: var(--panel, #ffffff);
+  border: 1.5px solid var(--ink, #101214);
+  border-radius: 12px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  box-shadow: 3px 3px 0 var(--ink, #101214);
 }
 
 .sentiment-meter {
   display: flex;
   height: 24px;
-  border-radius: var(--radius-sm);
+  border-radius: 6px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--paper, #eef1ec);
+  border: 1px solid var(--ink, #101214);
 }
 
 .sentiment-segment-pos {
-  background: var(--accent-success);
+  background: var(--lime, #c6f24e);
 }
 .sentiment-segment-neu {
-  background: #64748b;
+  background: var(--muted, #69707d);
 }
 .sentiment-segment-neg {
-  background: var(--accent-danger);
+  background: var(--coral, #ff4d4d);
 }
 
 .tag-cloud {
@@ -47,11 +48,12 @@
 }
 
 .intel-tag {
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #a5b4fc;
+  background: var(--paper, #eef1ec);
+  border: 1.5px solid var(--ink, #101214);
+  color: var(--ink, #101214);
   padding: 4px 10px;
-  border-radius: var(--radius-full);
+  border-radius: 999px;
   font-size: 0.8rem;
-  font-family: var(--font-mono);
+  font-weight: 600;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
 }
