@@ -31,7 +31,9 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost",
         "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000"
+        "http://127.0.0.1:3000",
+        "https://crawlix-chi.vercel.app",
+        "https://crawlix-mesh.duckdns.org"
     ]
 
     class Config:
