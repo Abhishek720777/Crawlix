@@ -1,88 +1,115 @@
-# 🌐 Crawlix: Distributed Web Scraping & Intelligence Platform
+# Crawlix — Distributed Web Scraping and Intelligence Platform
 
-> A production-grade, distributed web scraping and intelligence platform engineered with **FastAPI**, **Celery**, **Redis**, **PostgreSQL**, and **React.js**.
+**Live:** [https://crawlix-chi.vercel.app](https://crawlix-chi.vercel.app)
 
----
-
-## ⚡ Highlights & Key Technical Features (For Resume Showcase)
-
-- **Distributed Worker Mesh**: Multi-node Celery task execution topology consuming from priority queues (`high_priority`, `scraping_pool`, `ai_analysis`).
-- **Dynamic Telemetry & Heartbeat Registry**: Real-time worker health, CPU/RAM utilization, thread concurrency, and node metrics.
-- **Intelligent Scraping Engines**:
-  - **E-Commerce & Pricing Intelligence**: Price history, discount calculations, out-of-stock tracking.
-  - **News & Sentiment Engine**: Article content extraction, sentiment score calculation, key named entity recognition.
-  - **Generic Structured Ingestion**: JSON-LD / Schema.org parser, OpenGraph metadata, and custom CSS selector extraction.
-- **Async API Gateway**: Built with FastAPI, JWT Authentication (Argon2/Bcrypt + secure claims), and WebSockets for live crawl log streaming.
-- **Dark Glassmorphic UI**: Built with React.js and pure Vanilla CSS (modularized per component/page in `src/styles`).
-- **Data Export**: 1-Click structured JSON and CSV exporter for downstream ML/analytics pipelines.
+A distributed web scraping and data intelligence platform built with FastAPI, Celery, Redis, PostgreSQL, and React.js. Users define crawl jobs that are broken into tasks and executed across multiple Celery workers in parallel. Once a job completes, an automated post-processing pipeline generates structured intelligence reports including pricing summaries, sentiment analysis, and entity extraction.
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture
 
 ```
-[ React.js Frontend ] 
-        │
-   (REST / JWT & WebSocket)
-        ▼
-[ FastAPI API Gateway ] ───► [ PostgreSQL (Primary Storage) ]
-        │
-   (Task Dispatch & Telemetry)
-        ▼
-  [ Redis Broker ] 
-   ├── Queue: high_priority (Job orchestration & heartbeats)
-   ├── Queue: scraping_pool (Distributed web crawler nodes)
-   └── Queue: ai_analysis   (NLP sentiment & price aggregators)
-        ▲
-        │ (Task Ingestion & State Reporting)
-[ Celery Worker Mesh (Worker 1, Worker 2, Celery Beat) ]
+[ React.js Frontend (Vercel) ]
+         |
+   (REST / JWT + WebSocket)
+         |
+[ FastAPI API Gateway (AWS EC2) ] ───► [ PostgreSQL (Primary Storage) ]
+         |
+  (Task Dispatch + Telemetry)
+         |
+   [ Redis Broker ]
+    |-- Queue: high_priority   (Job orchestration and heartbeats)
+    |-- Queue: scraping_pool   (Distributed crawler workers)
+    |-- Queue: ai_analysis     (Intelligence post-processing)
+         |
+[ Celery Worker Mesh (Worker 1, Celery Beat) ]
 ```
 
 ---
 
-## 🚀 Quickstart Guide (Local Development)
+## Features
 
-### 1. Prerequisites
+**Distributed Crawling**
+- Multi-queue Celery task topology across `high_priority`, `scraping_pool`, and `ai_analysis` queues
+- Real-time worker telemetry: CPU and RAM utilization, thread concurrency, and node heartbeats via WebSockets
+
+**Scraping Engines**
+- E-Commerce: price extraction, availability tracking, and discount detection
+- News: article content extraction, sentiment polarity scoring, and named entity recognition
+- Generic: JSON-LD / Schema.org parsing, OpenGraph metadata, and custom CSS selector support
+
+**Intelligence Hub**
+- Automated post-processing pipeline triggered on job completion
+- Generates pricing intelligence, sentiment breakdowns, and entity summaries per job
+
+**API and Security**
+- FastAPI with JWT authentication (Argon2/Bcrypt), async database access, and WebSocket live log streaming
+- SSRF protection, streaming download size limits, CSV formula injection sanitization, and strict CORS enforcement
+- Unit and integration tests covering crawler engine behavior and task queue routing
+
+**Data Export**
+- One-click JSON and CSV export for downstream analytics or ML pipelines
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React.js, Vanilla CSS, Vite |
+| Backend | Python, FastAPI, Celery, Celery Beat |
+| Database | PostgreSQL, Redis |
+| Infrastructure | AWS EC2, Docker Compose, Nginx, Let's Encrypt |
+| Deployment | Vercel (frontend), DuckDNS + SSL (backend) |
+
+---
+
+## Local Development
+
+### Prerequisites
 - Python 3.10+
 - Node.js 18+
-- Redis & PostgreSQL (or use Docker Compose)
+- Redis and PostgreSQL (or use Docker Compose)
 
-### 2. Backend Setup
+### Backend
+
 ```bash
 cd backend
 python -m venv venv
-# Windows:
-.\venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
-
+source venv/bin/activate        # Windows: .\venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 3. Celery Worker (In a separate terminal)
+### Celery Worker
+
 ```bash
 cd backend
 celery -A app.workers.celery_app worker -Q high_priority,scraping_pool,ai_analysis -l INFO
 ```
 
-### 4. Frontend Setup
+### Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
 Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 🐳 One-Command Deployment with Docker Compose
+## Docker Deployment
 
-To deploy the entire production stack (PostgreSQL, Redis, FastAPI, 2 Celery Workers, Celery Beat, and React Frontend):
+Deploy the full production stack — PostgreSQL, Redis, FastAPI, Celery Workers, Celery Beat, and the React frontend — with a single command:
 
 ```bash
 docker compose up --build
 ```
-- Frontend UI: `http://localhost:3000`
-- API Swagger Docs: `http://localhost:8000/docs`
-- Healthcheck: `http://localhost:8000/health`
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| API (Swagger) | http://localhost:8000/docs |
+| Health Check | http://localhost:8000/health |
