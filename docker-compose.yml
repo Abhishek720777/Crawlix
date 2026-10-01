@@ -46,7 +46,7 @@ services:
     build: ./backend
     container_name: crawlix_worker_1
     restart: always
-    command: celery -A app.workers.celery_app worker -Q high_priority,scraping_pool -l INFO --concurrency=4 -n worker1@%h
+    command: celery -A app.workers.celery_app worker -Q high_priority,scraping_pool,ai_analysis -l INFO --concurrency=4 -n worker1@%h
     environment:
       - DATABASE_URL=postgresql+asyncpg://crawlix_user:crawlix_password@postgres:5432/crawlix_db
       - DATABASE_URL_SYNC=postgresql://crawlix_user:crawlix_password@postgres:5432/crawlix_db
